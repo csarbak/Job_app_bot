@@ -1,4 +1,4 @@
-import puppeteer, { Page } from "puppeteer";
+import puppeteer, { BrowserContext, Page } from "puppeteer";
 import config from "../config";
 
 import ask from "../utils/ask";
@@ -6,6 +6,8 @@ import message from "../utils/message";
 import login from "../login";
 import apply, { ApplicationFormData } from "../apply";
 import fetchJobLinksUser, { date_posted } from "../fetch/fetchJobLinksUser";
+import readline from "readline";
+import setupSigintHandler from "../utils/setupSigintHandler";
 
 interface AppState {
   paused: boolean;
@@ -31,12 +33,20 @@ const askForPauseInput = async () => {
 };
 
 (async () => {
+  
+  const testMode = process.argv[2] != "SUBMIT";
   const browser = await puppeteer.launch({
     headless: false,
     ignoreHTTPSErrors: true,
-    args: ["--disable-setuid-sandbox", "--no-sandbox",]
+    args: ["--disable-setuid-sandbox", "--no-sandbox",],
+    userDataDir: testMode ? './testingModeDataDir' : undefined, // Specify a path for storing user data while testing
+    handleSIGINT: false,
   });
-  const context = await browser.createIncognitoBrowserContext();
+  
+  await setupSigintHandler(browser);
+
+
+  const context: BrowserContext | null = testMode ? await browser.defaultBrowserContext() : await browser.createIncognitoBrowserContext();
   const listingPage = await context.newPage();
 
   const pages = await browser.pages();
@@ -46,7 +56,7 @@ const askForPauseInput = async () => {
   await login({
     page: listingPage,
     email: config.LINKEDIN_EMAIL,
-    password: config.LINKEDIN_PASSWORD
+    password: config.LINKEDIN_PASSWORD,
   });
 
   askForPauseInput();
@@ -95,7 +105,11 @@ const askForPauseInput = async () => {
         shouldSubmit: process.argv[2] === "SUBMIT",
       });
 
-      message(`Applied to ${title} at ${companyName}`);
+      if (process.argv[2] === "SUBMIT") {
+        message(`Applied to ${title} at ${companyName}`);
+      } else {
+        message('In test mode: Not submitting application.');
+      }
     } catch(e) {
       message(e as Error);
       message(`Error applying to ${title} at ${companyName}`);
@@ -103,11 +117,13 @@ const askForPauseInput = async () => {
 
     await listingPage.bringToFront();
 
-    for(let shouldLog = true; state.paused; shouldLog = false){
-	shouldLog && message("\nProgram paused, press enter to continue the program");
-	await wait(2000);
+    for (let shouldLog = true; state.paused; shouldLog = false) {
+      shouldLog && message("\nProgram paused, press enter to continue the program");
+      await wait(2000);
     }
   }
 
-  // await browser.close();
+  message("Closing browser");
+  await browser.close(); 
+
 })();

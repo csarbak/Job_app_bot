@@ -10,7 +10,8 @@ async function changeTextInput(container: ElementHandle | Page, selector: string
   const previousValue = await input.evaluate((el) => (el as HTMLInputElement).value);
 
   if (previousValue !== value) {
-    await input.click({ clickCount: 3 }); // Select whole text to replace existing text
+    // await input.click({ clickCount: 3 }); // Select whole text to replace existing text
+    await input.evaluate((el) => (el as HTMLInputElement).value = ''); // Clear existing text
     await input.type(value);
   }
 }

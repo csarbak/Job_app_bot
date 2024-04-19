@@ -14,6 +14,8 @@ export default {
   enabledSubmitOrNextButton: ".jobs-easy-apply-modal footer button[aria-label*='Submit']:enabled, .jobs-easy-apply-modal footer button[aria-label*='next']:enabled, .jobs-easy-apply-modal footer button[aria-label*='Review']:enabled",
   textInput: ".jobs-easy-apply-modal input[type='text'], .jobs-easy-apply-modal textarea",
   homeCity: ".jobs-easy-apply-modal input[id*='easyApplyFormElement'][id*='city-HOME-CITY']",
+  cityDropdown: ".basic-typeahead__triggered-content.fb-single-typeahead-entity__triggered-content",
+  cityDropdownOption: ".basic-typeahead__selectable",
   easyApplyFormBackground: ".pb4",
   phone: ".jobs-easy-apply-modal input[id*='easyApplyFormElement'][id*='phoneNumber']",
   documentUpload: ".jobs-easy-apply-modal div[class*='jobs-document-upload']",
@@ -35,8 +37,10 @@ export default {
   searchResultListText: "small.jobs-search-results-list__text",
   searchResultListItem: ".jobs-search-results-list li.jobs-search-results__list-item",
   searchResultListItemLink: "a.job-card-list__title",
-  searchResultListItemCompanyName: "div.job-card-container__company-name, a.job-card-container__company-name",
-  jobDescription: "div.jobs-description-content > div.jobs-description-content__text > span",
+  // searchResultListItemCompanyName: "div.job-card-container__company-name, a.job-card-container__company-name",
+  searchResultListItemCompanyName: ".job-card-container__primary-description",
+  // jobDescription: "div.jobs-description-content > div.jobs-description-content__text > span",
+  jobDescription: "#job-details",
   appliedToJobFeedback: ".artdeco-inline-feedback",
 
   // fetch guest

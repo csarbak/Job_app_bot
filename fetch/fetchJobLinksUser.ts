@@ -86,12 +86,22 @@ async function* fetchJobLinksUser({ page, datePosted = null, location, keywords,
 
     await page.goto(url.toString(), { waitUntil: "load" });
 
-    await page.waitForSelector(`${selectors.searchResultListItem}:nth-child(${Math.min(MAX_PAGE_SIZE, numAvailableJobs - numSeenJobs)})`, { timeout: 5000 });
+    // await page.waitForSelector(`${selectors.searchResultListItem}:nth-child(${Math.min(MAX_PAGE_SIZE, numAvailableJobs - numSeenJobs)})`, { timeout: 5000 });
+    const searchResultListItemsCount = await page.$$eval(selectors.searchResultListItem, items => items.length);    // Check the number of searchReus
+    const targetIndex = Math.min(searchResultListItemsCount, MAX_PAGE_SIZE, numAvailableJobs - numSeenJobs);    // Calculate the index to wait for
+    if (targetIndex > 0) {  // Ensure there is at least one item and the index is within range
+      await page.waitForSelector(`${selectors.searchResultListItem}:nth-child(${targetIndex})`, { timeout: 5000 });
+    } else {
+      throw new Error("No items available to select based on current conditions.");
+    }
 
     const jobListings = await page.$$(selectors.searchResultListItem);
+    message(`jobListings.length: ${jobListings.length}`)
+    let endLoop = Math.min(jobListings.length, MAX_PAGE_SIZE);
 
-    for (let i = 0; i < Math.min(jobListings.length, MAX_PAGE_SIZE); i++) {
+    for (let i = 0; i < endLoop; i++) {
       try {
+        message(`i: ${i}, endLoop: ${endLoop}`);
         const [link, title] = await page.$eval(`${selectors.searchResultListItem}:nth-child(${i + 1}) ${selectors.searchResultListItemLink}`, (el) => {
           const linkEl = el as HTMLLinkElement;
 
@@ -113,13 +123,32 @@ async function* fetchJobLinksUser({ page, datePosted = null, location, keywords,
         const jobDescriptionLanguage = languageDetector.detect(jobDescription, 1)[0][0];
         const matchesLanguage = jobDescriptionLanguages.includes("any") || jobDescriptionLanguages.includes(jobDescriptionLanguage);
 
+
+        message(`checking if job matches: ${title} @ ${companyName}`)
         if (canApply && jobTitleRegExp.test(title) && jobDescriptionRegExp.test(jobDescription) && matchesLanguage) {
           numMatchingJobs++;
 
+          message(`found match!: ${title} @ ${companyName}`);
           yield [link, title, companyName];
+        } else {
+          let reason = "";
+          if (!canApply) {
+            reason += "can't apply, ";
+          }
+          if (!jobTitleRegExp.test(title)) {
+            reason += "title doesn't match, ";
+          }
+          if (!jobDescriptionRegExp.test(jobDescription)) {
+            reason += "description doesn't match, ";
+          }
+          if (!matchesLanguage) {
+            reason += "language doesn't match";
+          }
+          message("failed match because: " + reason);
         }
       } catch (e) {
         message(e as Error);
+        return; 
       }
     }
 

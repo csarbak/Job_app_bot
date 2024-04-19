@@ -13,6 +13,13 @@ import message from '../utils/message';
 const noop = () => { };
 
 async function fillFields(page: Page, formData: ApplicationFormData): Promise<void> {
+  const textFields = {
+    ...formData.textFields,
+    ...formData.yearsOfExperience,
+  };
+
+  await fillTextFields(page, textFields).catch(message);
+
   await insertHomeCity(page, formData.homeCity).catch(noop);
 
   await insertPhone(page, formData.phone).catch(noop);
@@ -21,12 +28,6 @@ async function fillFields(page: Page, formData: ApplicationFormData): Promise<vo
 
   await uploadDocs(page, formData.cvPath, formData.coverLetterPath).catch(noop);
 
-  const textFields = {
-    ...formData.textFields,
-    ...formData.yearsOfExperience,
-  };
-
-  await fillTextFields(page, textFields).catch(message);
 
   const booleans = formData.booleans;
 

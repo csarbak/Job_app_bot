@@ -108,3 +108,9 @@ config.ts
 
 # Ignore VS Code workspace settings
 .vscode
+
+# Ignore puppeteer Testing mode data directory
+testingModeDataDir
+
+# Ignore file w/ unanswered questions
+unansweredQuestions.txt

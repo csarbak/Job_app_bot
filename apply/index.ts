@@ -61,7 +61,7 @@ async function apply({ page, link, formData, shouldSubmit }: Params): Promise<vo
 
   if (shouldSubmit) {
     await submitButton.click();
-  }
+  } 
 }
 
 export default apply;

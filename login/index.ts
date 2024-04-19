@@ -15,7 +15,14 @@ async function login({ page, email, password }: Params): Promise<void> {
   await page.goto('https://www.linkedin.com/', { waitUntil: 'load' });
 
   // Enter login credentials and submit the form
-  await page.type(selectors.emailInput, email);
+  try {
+    await page.waitForSelector(selectors.emailInput, { timeout: 5000 });
+    await page.type(selectors.emailInput, email);
+  } catch (e) {
+    message("In test mode: Already logged in");
+    return;
+  }
+
   await page.type(selectors.passwordInput, password);
 
   await page.click(selectors.loginSubmit);
