@@ -55,12 +55,16 @@ async function apply({ page, link, formData, shouldSubmit }: Params): Promise<vo
 
   const submitButton = await page.$(selectors.submit);
 
+  let numSubmissions = 0;
+
   if (!submitButton) {
     throw new Error('Submit button not found');
   }
 
   if (shouldSubmit) {
     await submitButton.click();
+    numSubmissions++;
+    console.log("Submitted Jobs :" + numSubmissions);
   } 
 }
 

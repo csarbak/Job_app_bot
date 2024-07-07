@@ -89,9 +89,10 @@ async function* fetchJobLinksUser({ page, datePosted = null, location, keywords,
     // await page.waitForSelector(`${selectors.searchResultListItem}:nth-child(${Math.min(MAX_PAGE_SIZE, numAvailableJobs - numSeenJobs)})`, { timeout: 5000 });
     const searchResultListItemsCount = await page.$$eval(selectors.searchResultListItem, items => items.length);    // Check the number of searchReus
     const targetIndex = Math.min(searchResultListItemsCount, MAX_PAGE_SIZE, numAvailableJobs - numSeenJobs);    // Calculate the index to wait for
-    if (targetIndex > 0) {  // Ensure there is at least one item and the index is within range
+    if (true) {  // Ensure there is at least one item and the index is within range
       await page.waitForSelector(`${selectors.searchResultListItem}:nth-child(${targetIndex})`, { timeout: 5000 });
     } else {
+      console.log("this error in fetchJobLinksUser line 95");
       throw new Error("No items available to select based on current conditions.");
     }
 
@@ -148,6 +149,7 @@ async function* fetchJobLinksUser({ page, datePosted = null, location, keywords,
         }
       } catch (e) {
         message(e as Error);
+        console.log("this error in fetchJobLinksUser line 151");
         return; 
       }
     }
