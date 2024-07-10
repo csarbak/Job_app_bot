@@ -18,6 +18,8 @@ const wait = (time: number) => new Promise((resolve) => setTimeout(resolve, time
 const state: AppState = {
   paused: false,
 };
+var submittedJobs=0;
+
 
 const askForPauseInput = async () => {
   await ask("press enter to pause the program");
@@ -105,10 +107,18 @@ const askForPauseInput = async () => {
         shouldSubmit: process.argv[2] === "SUBMIT",
       });
 
+
       if (process.argv[2] === "SUBMIT") {
         message(`Applied to ${title} at ${companyName}`);
+        submittedJobs ++;
+        console.log(`SUBMITTED JOBS : ${submittedJobs}`)
+        //await applicationPage.close();
       } else {
         message('In test mode: Not submitting application.');
+        submittedJobs ++;
+        console.log(`SUBMITTED JOBS : ${submittedJobs}`)
+        //await applicationPage.close();
+
       }
     } catch(e) {
       message(e as Error);

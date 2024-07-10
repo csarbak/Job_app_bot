@@ -19,6 +19,7 @@ async function login({ page, email, password }: Params): Promise<void> {
     await page.waitForSelector(selectors.emailInput, { timeout: 5000 });
     await page.type(selectors.emailInput, email);
   } catch (e) {
+    console.log({e});
     message("In test mode: Already logged in");
     return;
   }
